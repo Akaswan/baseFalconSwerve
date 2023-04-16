@@ -4,6 +4,7 @@
 
 package frc.robot.subsystems;
 
+import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.ctre.phoenix.sensors.CANCoder;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel;
@@ -32,8 +33,8 @@ public class SwerveModule extends SubsystemBase {
   public static final double kDriveRpmToMetersPerSecond = kDriveRevToMeters / 60.0;
   public static final double kTurnRotationsToDegrees = 360.0 / TURN_GEAR_RATIO;
 
-  private CANSparkMax m_driveMotor;
-  private CANSparkMax m_turningMotor;
+  private TalonFX m_driveMotor;
+  private TalonFX m_turningMotor;
   private CANCoder m_angleEncoder;
 
   public final RelativeEncoder m_driveEncoder;
@@ -58,13 +59,14 @@ public class SwerveModule extends SubsystemBase {
   public SwerveModule(int moduleNumber, SwerveModuleConstants swerveModuleConstants) {
     m_moduleNumber = moduleNumber;
 
-    m_driveMotor = new CANSparkMax(swerveModuleConstants.driveMotorChannel, CANSparkMaxLowLevel.MotorType.kBrushless);
-    m_turningMotor = new CANSparkMax(swerveModuleConstants.turningMotorChannel, CANSparkMaxLowLevel.MotorType.kBrushless);
+    m_driveMotor = new TalonFX(swerveModuleConstants.driveMotorChannel);
+    m_turningMotor = new TalonFX(swerveModuleConstants.turningMotorChannel);
 
     m_angleEncoder = new CANCoder(swerveModuleConstants.cancoderID, "rio");
     m_angleOffset = swerveModuleConstants.angleOffset;
 
-    m_driveMotor.restoreFactoryDefaults();
+    m_driveMotor.configFactoryDefault();
+    m_driveMotor.getPIDConfigs(null);
     RevUtils.setDriveMotorConfig(m_driveMotor, false);
     m_driveMotor.setIdleMode(CANSparkMax.IdleMode.kBrake);
     m_driveMotor.setInverted(true);// MK4i drive motor is inverted
